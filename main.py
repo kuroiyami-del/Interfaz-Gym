@@ -18,8 +18,12 @@ def main():
                 telefono = input("Teléfono: ")
                 foto = input("Ruta de la foto: ")
                 cedula = input("Cédula: ")
-                insertarUsuario(nombre, edad, telefono, foto, cedula)
+                direccion = input("Direccion: ")
+                plan = input("Ingrese el tipo de plan: ")
+
+                insertarUsuario(nombre, edad, telefono, foto, cedula,direccion,plan)
                 print("\nUsuario agregado con éxito.")
+
         if opcion == 2:
             usuarios = mostrarUsuarios()
             for usuario in usuarios:
@@ -28,6 +32,7 @@ def main():
         if opcion == 3:
                 cedula = input("Ingrese la cédula del usuario a eliminar: ")
                 eliminarUsuario(cedula)
+                
 
         if opcion == 0:
             print("Saliendo del programa")
