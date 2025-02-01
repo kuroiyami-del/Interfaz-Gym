@@ -5,6 +5,9 @@ def connect():
     return sqlite3.connect("database/gym.db")
 
 
+conn= connect()
+cursor = conn.cursor()
+
 # OPERACIONES PARA LA TABLA usuarios
 
 def insertarUsuario(nombre,edad,telefono,foto,cedula,direccion):
@@ -78,7 +81,6 @@ def usuarioEspecifico(cedula):
     finally:
         conn.close()
 
-
 def modificarUsuario(cedula):
     conn = connect()
     cursor = conn.cursor()
@@ -135,51 +137,48 @@ def modificarUsuario(cedula):
 
         
 
+
+
 # OPERACIONES PARA LA TABLA planes
 
-def asignarPlan(id_usuario,tipo_plan):
-    conn = connect()
+
+def asignarPlan(cedula, tipo_plan, fecha_inicio, fecha_fin):
+    conn = sqlite3.connect("database/gym.db")
     cursor = conn.cursor()
-    
+
     try:
-    
-        fecha_inicio = datetime.today().date()  # Fecha de hoy
-        
-        duraciones = {
+        # Buscar el ID del usuario con la cédula proporcionada
+        cursor.execute("SELECT id FROM usuarios WHERE cedula = ?", (cedula,))
+        usuario = cursor.fetchone()
 
-            "diario": timedelta(days=1),
-            "semanal": timedelta(weeks=1),
-            "quincenal": timedelta(days=15),
-            "mensual": timedelta(days=30),
-            "trimestral": timedelta(days=90),
-            "anual": timedelta(days=365)
-        }
+        if usuario is None:
+            print(f"⚠️ No se encontró un usuario con la cédula {cedula}. No se puede asignar el plan.")
+            return
 
-        if tipo_plan.lower() not in duraciones:
-            print("⚠️ Tipo de plan no válido.")
-        
-        fecha_fin = fecha_inicio + duraciones[tipo_plan.lower()]
+        usuario_id = usuario[0]
 
+        # Insertar el nuevo plan en la base de datos
         cursor.execute("""
-                        INSERT INTO planes (id_usuario, tipo_plan, fecha_inicio, fecha_fin)
-                        VALUES (?,?,?,?)
-        """, (id_usuario, tipo_plan, fecha_inicio, fecha_fin))
+            INSERT INTO planes (id_usuario, tipo_plan, fecha_inicio, fecha_fin)
+            VALUES (?, ?, ?, ?)
+        """, (usuario_id, tipo_plan, fecha_inicio, fecha_fin))
+
         conn.commit()
-        print(f"✅ Plan '{tipo_plan}' agregado con éxito. Fecha de vencimiento: {fecha_fin}")
+        print(f"✅ Plan '{tipo_plan}' asignado correctamente a {cedula}.")
 
     except sqlite3.Error as e:
-        print(f"❌ Error al agregar el plan: {e}")
+        print(f"❌ Error al asignar el plan: {e}")
 
     finally:
         conn.close()
 
-
 def mostrarPlanUsuario(cedula):
-    conn = connect()
-    cursor = conn.cursor()
-
+    conn = None  # Inicializar la conexión fuera del try-except para cerrarla correctamente
     try:
-        # Obtener el ID del usuario con la cédula ingresada
+        conn = sqlite3.connect("database/gym.db")  # Conectar a la base de datos
+        cursor = conn.cursor()
+
+        # Buscar al usuario por cédula
         cursor.execute("SELECT id, nombre FROM usuarios WHERE cedula = ?", (cedula,))
         usuario = cursor.fetchone()
 
@@ -188,17 +187,18 @@ def mostrarPlanUsuario(cedula):
             return
         
         usuario_id, nombre = usuario
+        print(f"📌 Usuario encontrado: {nombre} (ID: {usuario_id})")  # 🔍 Depuración
 
-        # Buscar el plan del usuario
+        # Verificar si el usuario tiene un plan activo
         cursor.execute("""
-            SELECT tipo_plan, fecha_inicio, fecha_fin
+            SELECT tipo_plan, fecha_inicio, fecha_fin 
             FROM planes WHERE id_usuario = ?
         """, (usuario_id,))
-
+        
         plan = cursor.fetchone()
 
         if plan is None:
-            print(f"⚠️ {nombre} no tiene un plan activo.")
+            print(f"⚠️ {nombre} está registrado, pero no tiene un plan activo.")
             return
         
         tipo_plan, fecha_inicio, fecha_fin = plan
@@ -216,5 +216,10 @@ def mostrarPlanUsuario(cedula):
         print(f"❌ Error al obtener el plan: {e}")
 
     finally:
-        conn.close()
+        if conn:
+            conn.close()  # Asegurar que la conexión siempre se cierra
+
+
+
+
 

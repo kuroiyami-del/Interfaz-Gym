@@ -28,7 +28,7 @@ def main():
                 
 
                 insertarUsuario(nombre, edad, telefono, foto, cedula, direccion)
-                print("\✅Usuario agregado con éxito.")
+                print("\n✅Usuario agregado con éxito.")
 
         if opcion == 2:
             usuarios = mostrarUsuarios()
@@ -56,7 +56,6 @@ def main():
         if opcion == 6:
             cedula = input("Ingrese la cédula del usuario para asignar un plan: ")
             
-            # Definir planes con duración en días
             opciones_plan = {
                 "1": ("Diario", 1),
                 "2": ("Semanal", 7),
@@ -70,7 +69,7 @@ def main():
             for key, (nombre, _) in opciones_plan.items():
                 print(f"{key}. {nombre}")
 
-            tipo_plan = input("\nSeleccione una opción de plan: ")
+            tipo_plan = input("\nSeleccione el numero de plan: ").strip()
 
             if tipo_plan not in opciones_plan:
                 print("⚠️ Opción de plan inválida.")
@@ -78,11 +77,12 @@ def main():
 
             plan_nombre, dias_duracion = opciones_plan[tipo_plan]
 
-            # Calcular fechas de inicio y vencimiento automáticamente
             fecha_inicio = datetime.now().strftime("%Y-%m-%d")
             fecha_fin = (datetime.now() + timedelta(days=dias_duracion)).strftime("%Y-%m-%d")
 
+            # Pasar todos los valores correctamente
             asignarPlan(cedula, plan_nombre, fecha_inicio, fecha_fin)
+
 
         if opcion == 7:
             cedula = input("Ingrese la cédula del usuario: ")
