@@ -172,5 +172,5 @@ cython_debug/
 .pypirc
 =======
 venv/
-__pycache__
+
 >>>>>>> 24d3ae0 (Se creo la estructura principal del proyecto)

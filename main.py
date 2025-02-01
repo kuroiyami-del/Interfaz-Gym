@@ -1,15 +1,19 @@
 from database.db_setup import crearDataBase
 from database.db_operaciones import *
+from datetime import datetime, timedelta
 
 
 def main():
     crearDataBase()
     while True:
+        print("\n🏋️  GESTIÓN DE GIMNASIO  🏋️")
         print("1. Crear un nuevo usuario ")
         print("2. Ver todos los usuarios ")
         print("3. Eliminar usuario ")
         print("4. Buscar un usuario especifico ")
         print("5. Alterar usuario ")
+        print("6. Asigna un plan a usuario")
+        print("7. Ver plan de usuario")
         print("0. Salir")
         
         opcion = int(input("Inserta tu opcion: "))
@@ -21,15 +25,16 @@ def main():
                 foto = input("Ruta de la foto: ")
                 cedula = input("Cédula: ")
                 direccion = input("Direccion: ")
-                plan = input("Ingrese el tipo de plan: ")
+                
 
-                insertarUsuario(nombre, edad, telefono, foto, cedula, direccion, plan)
-                print("\nUsuario agregado con éxito.")
+                insertarUsuario(nombre, edad, telefono, foto, cedula, direccion)
+                print("\✅Usuario agregado con éxito.")
 
         if opcion == 2:
             usuarios = mostrarUsuarios()
             for usuario in usuarios:
-                    print(f'\n{usuario}')
+                    print(f'\n{usuario}\n')
+                    print(f'-'*30)
         
         if opcion == 3:
                 cedula = input("Ingrese la cédula del usuario a eliminar: ")
@@ -47,6 +52,41 @@ def main():
         if opcion == 5:
             cedula = input("Ingrese la cédula del usuario a modificar: ")
             modificarUsuario(cedula)
+        
+        if opcion == 6:
+            cedula = input("Ingrese la cédula del usuario para asignar un plan: ")
+            
+            # Definir planes con duración en días
+            opciones_plan = {
+                "1": ("Diario", 1),
+                "2": ("Semanal", 7),
+                "3": ("Mensual", 30),
+                "4": ("Trimestral", 90),
+                "5": ("Anual", 365)
+            }
+
+            # Mostrar opciones de planes
+            print("\n🏋️  PLANES DISPONIBLES")
+            for key, (nombre, _) in opciones_plan.items():
+                print(f"{key}. {nombre}")
+
+            tipo_plan = input("\nSeleccione una opción de plan: ")
+
+            if tipo_plan not in opciones_plan:
+                print("⚠️ Opción de plan inválida.")
+                continue
+
+            plan_nombre, dias_duracion = opciones_plan[tipo_plan]
+
+            # Calcular fechas de inicio y vencimiento automáticamente
+            fecha_inicio = datetime.now().strftime("%Y-%m-%d")
+            fecha_fin = (datetime.now() + timedelta(days=dias_duracion)).strftime("%Y-%m-%d")
+
+            asignarPlan(cedula, plan_nombre, fecha_inicio, fecha_fin)
+
+        if opcion == 7:
+            cedula = input("Ingrese la cédula del usuario: ")
+            mostrarPlanUsuario(cedula)
 
         if opcion == 0:
             print("Saliendo del programa")

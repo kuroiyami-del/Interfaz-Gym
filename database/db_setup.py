@@ -12,8 +12,7 @@ def crearDataBase():
             telefono TEXT NOT NULL,
             foto TEXT NOT NULL,
             cedula TEXT NOT NULL UNIQUE,
-            direccion TEXT NOT NULL,
-            plan TEXT NOT NULL
+            direccion TEXT NOT NULL  
         )
     """)
 
